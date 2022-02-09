@@ -1,10 +1,8 @@
-import * as React from 'react';
-import './assets/css/tailwind.css';
+import * as React from "react";
+import "./assets/css/tailwind.css";
 
 function App() {
-  return (
-    <></>
-  );
+  return <></>;
 }
 
 export default App;
