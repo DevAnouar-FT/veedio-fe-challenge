@@ -1,5 +1,5 @@
 import * as React from "react";
-import "./assets/css/tailwind.css";
+import "./assets/css/app.scss";
 
 function App() {
   return <></>;
