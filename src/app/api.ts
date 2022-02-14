@@ -1,4 +1,4 @@
-interface GitHubRepositoriesApiData {
+export interface GitHubRepositoriesApiData {
   items: {
     id: number;
     name: string;
@@ -9,8 +9,8 @@ interface GitHubRepositoriesApiData {
   total_count: number;
 }
 
-export const fetchTrendingRepositoriesCreatedInLastSevenDays =
-  async (): Promise<GitHubRepositoriesApiData | never> => {
+export const trendingRepositoriesCreatedInLastSevenDaysEndpoint =
+  ((): string => {
     const dateFromSevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
     const formattedDateFromSevenDaysAgo = [
       dateFromSevenDaysAgo.getFullYear(),
@@ -25,9 +25,16 @@ export const fetchTrendingRepositoriesCreatedInLastSevenDays =
       )
       .join("-");
 
-    const response = await fetch(
+    return (
       "https://api.github.com/search/repositories" +
-        `?q=created:>${formattedDateFromSevenDaysAgo}&sort=stars&order=desc`
+      `?q=created:>${formattedDateFromSevenDaysAgo}&sort=stars&order=desc`
+    );
+  })();
+
+export const fetchTrendingRepositoriesCreatedInLastSevenDays =
+  async (): Promise<GitHubRepositoriesApiData | never> => {
+    const response = await fetch(
+      trendingRepositoriesCreatedInLastSevenDaysEndpoint
     );
 
     if (!response.ok) {
