@@ -5,7 +5,7 @@ interface Props {
   name: string;
   starsCount: number;
   githubLink: string;
-  description: string;
+  description?: string;
 }
 
 const RepositoryInformations = ({
@@ -46,7 +46,9 @@ const RepositoryInformations = ({
     </div>
 
     <h4 className="sr-only">Description</h4>
-    <p className="leading-normal mt-6">{description}</p>
+    {description && (
+      <p className="prose dark:prose-invert mt-6">{description}</p>
+    )}
   </div>
 );
 
