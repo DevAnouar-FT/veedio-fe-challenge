@@ -64,6 +64,8 @@
   "jest": {
     "collectCoverageFrom": [
       "src/**/*.{ts,tsx}",
+      "!src/{index,App}.tsx",
+      "!src/reportWebVitals.ts",
       "!src/mocks/**/*.ts"
     ],
     "coverageThreshold": {
