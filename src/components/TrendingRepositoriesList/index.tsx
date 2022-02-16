@@ -2,6 +2,7 @@ import * as React from "react";
 import List from "../../ui/List";
 import RepositoryInformations from "../RepositoryInformations";
 import { fetchTrendingRepositoriesCreatedInLastSevenDays } from "../../app/api";
+import { FetchStatus } from "../../app/types";
 
 type RepositoryData = React.ComponentProps<typeof RepositoryInformations>;
 
@@ -10,9 +11,22 @@ const TrendingRepositoriesList = (): JSX.Element | null => {
     RepositoryData[]
   >([]);
 
+  const [fetchStatus, setFetchStatus] = React.useState<FetchStatus>(
+    FetchStatus.IDLE
+  );
+  const textToDisplayByFetchStatusWhenNoRepositoryIsRendered: Record<
+    FetchStatus,
+    string
+  > = {
+    loading: "Loading...",
+    idle: "No repository has been found.",
+    failed: "An error has occured!",
+  };
+
   React.useEffect(() => {
-    (async () => {
+    const initTrendingRepositories = async (): Promise<void> => {
       try {
+        setFetchStatus(FetchStatus.LOADING);
         const fetchedRepositoriesData =
           await fetchTrendingRepositoriesCreatedInLastSevenDays();
 
@@ -33,13 +47,17 @@ const TrendingRepositoriesList = (): JSX.Element | null => {
             })
           )
         );
+        setFetchStatus(FetchStatus.IDLE);
       } catch (error) {
+        setFetchStatus(FetchStatus.FAILED);
         console.error(error);
       }
-    })();
+    };
+
+    initTrendingRepositories();
   }, []);
 
-  return trendingRepositories.length ? (
+  return fetchStatus === FetchStatus.IDLE && trendingRepositories.length ? (
     <List>
       {trendingRepositories.map<JSX.Element>(
         ({ id, name, starsCount, githubLink, description }) => (
@@ -55,7 +73,11 @@ const TrendingRepositoriesList = (): JSX.Element | null => {
         )
       )}
     </List>
-  ) : null;
+  ) : (
+    <p className="flex justify-center mt-6">
+      {textToDisplayByFetchStatusWhenNoRepositoryIsRendered[fetchStatus]}
+    </p>
+  );
 };
 
 export default TrendingRepositoriesList;

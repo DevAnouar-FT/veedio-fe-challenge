@@ -1,3 +1,5 @@
+import { trendingRepositoriesCreatedInLastSevenDays as trendingRepositoriesCreatedInLastSevenDaysEndpoint } from "./endpoints";
+
 export interface GitHubRepositoriesApiData {
   items: {
     id: number;
@@ -5,31 +7,9 @@ export interface GitHubRepositoriesApiData {
     stargazers_count: number;
     html_url: string;
     description: string | null;
+    created_at: string;
   }[];
-  total_count: number;
 }
-
-export const trendingRepositoriesCreatedInLastSevenDaysEndpoint =
-  ((): string => {
-    const dateFromSevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
-    const formattedDateFromSevenDaysAgo = [
-      dateFromSevenDaysAgo.getFullYear(),
-      dateFromSevenDaysAgo.getMonth() + 1,
-      dateFromSevenDaysAgo.getDate(),
-    ]
-      .map<string>((currentDatePart) =>
-        currentDatePart.toLocaleString(undefined, {
-          minimumIntegerDigits: 2,
-          useGrouping: false,
-        })
-      )
-      .join("-");
-
-    return (
-      "https://api.github.com/search/repositories" +
-      `?q=created:>${formattedDateFromSevenDaysAgo}&sort=stars&order=desc`
-    );
-  })();
 
 export const fetchTrendingRepositoriesCreatedInLastSevenDays =
   async (): Promise<GitHubRepositoriesApiData | never> => {
@@ -45,14 +25,5 @@ export const fetchTrendingRepositoriesCreatedInLastSevenDays =
       );
     }
 
-    return response.json() as Promise<{
-      items: {
-        id: number;
-        name: string;
-        stargazers_count: number;
-        html_url: string;
-        description: string | null;
-      }[];
-      total_count: number;
-    }>;
+    return response.json() as Promise<GitHubRepositoriesApiData>;
   };
