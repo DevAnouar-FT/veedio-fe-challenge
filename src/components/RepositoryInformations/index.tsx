@@ -1,4 +1,25 @@
 import * as React from "react";
+import classNames from "classnames";
+import {
+  HeartIcon as HeartIconOutline,
+  StarIcon,
+} from "@heroicons/react/outline";
+import { HeartIcon as HeartIconSolid } from "@heroicons/react/solid";
+import { Switch } from "@headlessui/react";
+
+const FavouriteToggle = (): JSX.Element => {
+  const [enabled, setEnabled] = React.useState<boolean>(false);
+  const descriptiveLabel = `${enabled ? "Remove from" : "Add to"} favourites`;
+
+  return (
+    <Switch checked={enabled} onChange={setEnabled} title={descriptiveLabel}>
+      <span className="sr-only">{descriptiveLabel}</span>
+      <span className="inline-block h-6 w-6 text-purple-500">
+        {enabled ? <HeartIconSolid /> : <HeartIconOutline />}
+      </span>
+    </Switch>
+  );
+};
 
 interface Props {
   id: string;
@@ -6,6 +27,7 @@ interface Props {
   starsCount: number;
   githubLink: string;
   description?: string;
+  children?: React.ReactNode;
 }
 
 const RepositoryInformations = ({
@@ -14,25 +36,24 @@ const RepositoryInformations = ({
   starsCount,
   githubLink,
   description,
+  children,
 }: Props): JSX.Element => (
   <div
     aria-labelledby={`repoName-${id}`}
-    className="p-6 rounded-lg shadow-md dark:bg-slate-800"
+    className={classNames(
+      { relative: children },
+      "p-4 sm:p-6 rounded-lg shadow-md dark:bg-slate-800"
+    )}
   >
-    <div className="flex flex-wrap">
+    <div className="flex flex-wrap items-center">
       <h3
         id={`repoName-${id}`}
-        className="flex-auto text-lg font-semibold dark:text-white"
+        className="w-full text-lg font-semibold dark:text-white"
       >
         <span className="sr-only">Name:</span> {name}
       </h3>
 
-      <h4 className="sr-only">Stars</h4>
-      <div className="text-lg font-semibold text-slate-400">
-        <strong>{starsCount}</strong> stars
-      </div>
-
-      <div className="w-full flex-none text-sm font-medium text-slate-400">
+      <div className="text-sm font-medium text-slate-400 truncate max-w-[12rem] sm:max-w-none">
         <h4 className="sr-only">Link to GitHub</h4>
         <a
           title={githubLink}
@@ -43,13 +64,37 @@ const RepositoryInformations = ({
           {githubLink.replace("https://", "")}
         </a>
       </div>
+
+      <h4 className="sr-only">Stars</h4>
+      <div
+        className={classNames([
+          "text-xs font-semibold leading-tight text-slate-400",
+          "ml-4",
+          "flex items-center",
+          "relative before:absolute before:-left-2 before:top-0 before:w-px before:h-4 before:bg-current",
+        ])}
+      >
+        <StarIcon className="w-4 h-4" />
+        <p className="ml-1">
+          <strong>{starsCount}</strong> stars
+        </p>
+      </div>
     </div>
 
     <h4 className="sr-only">Description</h4>
     {description && (
       <p className="prose dark:prose-invert mt-6">{description}</p>
     )}
+
+    {children && (
+      <div className="absolute right-4 top-4 sm:right-6 sm:top-6">
+        <h4 className="sr-only">Action</h4>
+        {children}
+      </div>
+    )}
   </div>
 );
+
+RepositoryInformations.FavouriteToggle = FavouriteToggle;
 
 export default RepositoryInformations;
