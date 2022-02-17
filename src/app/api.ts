@@ -32,29 +32,35 @@ export const fetchTrendingRepositoriesCreatedInLastSevenDays =
 const favouritedRepositoriesStorageKey = "favouritedRepositories";
 
 const fetchFavouritedRepositories = (favouritesStorageKey: string) =>
-  JSON.parse(
-    localStorage.getItem(favouritesStorageKey) ?? "[]"
-  ) as UiRepository[];
+  JSON.parse(localStorage.getItem(favouritesStorageKey) ?? "{}") as Record<
+    UiRepository["id"],
+    Omit<UiRepository, "id">
+  >;
 
 export const addRepositoryToFavourites = (repository: UiRepository): void => {
+  const { id: repositoryId, ...otherRepositoryData } = repository;
   localStorage.setItem(
     favouritedRepositoriesStorageKey,
-    JSON.stringify([
-      repository,
+    JSON.stringify({
+      [repositoryId]: otherRepositoryData,
       ...fetchFavouritedRepositories(favouritedRepositoriesStorageKey),
-    ])
+    })
   );
 };
 
 export const removeRepositoryFromFavourites = (
   repositoryId: UiRepository["id"]
 ): void => {
+  const { [repositoryId]: repositoryToRemove, ...otherRepositories } =
+    fetchFavouritedRepositories(favouritedRepositoriesStorageKey);
+
   localStorage.setItem(
     favouritedRepositoriesStorageKey,
-    JSON.stringify(
-      fetchFavouritedRepositories(favouritedRepositoriesStorageKey).filter(
-        (currentRepository) => currentRepository.id !== repositoryId
-      )
-    )
+    JSON.stringify(otherRepositories)
   );
 };
+
+export const isRepositoryFavourited = (
+  repositoryId: UiRepository["id"]
+): boolean =>
+  !!fetchFavouritedRepositories(favouritedRepositoriesStorageKey)[repositoryId];

@@ -1,21 +1,15 @@
 import * as React from "react";
 
-import { FetchStatus } from "../../app/types";
+import { FetchStatus, UiRepository } from "../../app/types";
 import List from "../../ui/List";
 import RepositoryInformations from "../RepositoryInformations";
 
-type RepositoryData = Omit<
-  React.ComponentProps<typeof RepositoryInformations>,
-  "children"
->;
-
 interface Props {
-  repositories: RepositoryData[];
+  repositories: UiRepository[];
   fetchStatus: FetchStatus;
-  onFavouritedRepositoryChange(newFavouritedStatusForRepository: {
-    repositoryId: string;
-    favourited: boolean;
-  }): void;
+  onFavouritedRepositoryChange: React.ComponentProps<
+    typeof RepositoryInformations.FavouriteToggle
+  >["onFavouritedChange"];
 }
 
 const TrendingRepositoriesListView = ({
@@ -45,12 +39,8 @@ const TrendingRepositoriesListView = ({
               description={description}
             >
               <RepositoryInformations.FavouriteToggle
-                onFavouritedChange={(favourited) => {
-                  onFavouritedRepositoryChange({
-                    repositoryId: id,
-                    favourited,
-                  });
-                }}
+                repositoryId={id}
+                onFavouritedChange={onFavouritedRepositoryChange}
               />
             </RepositoryInformations>
           </List.Item>

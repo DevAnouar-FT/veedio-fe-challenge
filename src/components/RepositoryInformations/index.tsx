@@ -8,15 +8,23 @@ import { HeartIcon as HeartIconSolid } from "@heroicons/react/solid";
 import { Switch } from "@headlessui/react";
 
 import type { UiRepository } from "../../app/types";
+import { isRepositoryFavourited } from "../../app/api";
 
 interface FavouriteToggleProps {
-  onFavouritedChange(favourited: boolean): void;
+  repositoryId: UiRepository["id"];
+  onFavouritedChange(newFavouriteStatusForRepository: {
+    repositoryId: string;
+    favourited: boolean;
+  }): void;
 }
 
 const FavouriteToggle = ({
+  repositoryId,
   onFavouritedChange,
 }: FavouriteToggleProps): JSX.Element => {
-  const [favourited, setFavourited] = React.useState<boolean>(false);
+  const [favourited, setFavourited] = React.useState<boolean>(
+    isRepositoryFavourited(repositoryId)
+  );
   const descriptiveLabel = `${
     favourited ? "Remove from" : "Add to"
   } favourites`;
@@ -25,7 +33,7 @@ const FavouriteToggle = ({
     checked
   ) => {
     setFavourited(checked);
-    onFavouritedChange(checked);
+    onFavouritedChange({ repositoryId, favourited: checked });
   };
 
   return (
