@@ -8,7 +8,7 @@ import {
 } from "./dummies";
 import type { GitHubRepositoriesApiData } from "../app/api";
 
-export const fullListOfGithubRepositoriesHandler = rest.get<
+export const populatedListOfGithubRepositoriesHandler = rest.get<
   DefaultRequestBody,
   PathParams,
   GitHubRepositoriesApiData

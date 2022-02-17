@@ -2,11 +2,11 @@ import { setupServer } from "msw/node";
 import {
   emptyListOfGithubRepositoriesHandler,
   erroneousFetchingOfGithubRepositoriesHandler,
-  fullListOfGithubRepositoriesHandler,
+  populatedListOfGithubRepositoriesHandler,
 } from "./handlers";
 
-export const fullListOfRepositoriesServer = setupServer(
-  fullListOfGithubRepositoriesHandler
+export const populatedListOfRepositoriesServer = setupServer(
+  populatedListOfGithubRepositoriesHandler
 );
 export const emptyListOfRepositoriesServer = setupServer(
   emptyListOfGithubRepositoriesHandler

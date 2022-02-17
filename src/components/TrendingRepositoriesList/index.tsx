@@ -31,7 +31,7 @@ const TrendingRepositoriesList = (): JSX.Element => {
 
         if (componentIsMounted.current) {
           setTrendingRepositories(
-            fetchedRepositoriesData.items.map<Repositories[0]>(
+            fetchedRepositoriesData.items.map<UiRepository>(
               ({
                 id,
                 name,
