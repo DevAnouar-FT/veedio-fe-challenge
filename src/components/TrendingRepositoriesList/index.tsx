@@ -18,38 +18,50 @@ const TrendingRepositoriesList = (): JSX.Element => {
     FetchStatus.IDLE
   );
 
+  const componentIsMounted = React.useRef<boolean>(false);
+
   React.useEffect(() => {
+    componentIsMounted.current = true;
+
     const initTrendingRepositories = async (): Promise<void> => {
       try {
         setFetchStatus(FetchStatus.LOADING);
         const fetchedRepositoriesData =
           await fetchTrendingRepositoriesCreatedInLastSevenDays();
 
-        setTrendingRepositories(
-          fetchedRepositoriesData.items.map<Repositories[0]>(
-            ({
-              id,
-              name,
-              stargazers_count: starsCount,
-              html_url: githubLink,
-              description,
-            }) => ({
-              id: `${id}`,
-              name,
-              starsCount,
-              githubLink,
-              description: description ?? undefined,
-            })
-          )
-        );
-        setFetchStatus(FetchStatus.IDLE);
+        if (componentIsMounted.current) {
+          setTrendingRepositories(
+            fetchedRepositoriesData.items.map<Repositories[0]>(
+              ({
+                id,
+                name,
+                stargazers_count: starsCount,
+                html_url: githubLink,
+                description,
+              }) => ({
+                id: `${id}`,
+                name,
+                starsCount,
+                githubLink,
+                description: description ?? undefined,
+              })
+            )
+          );
+          setFetchStatus(FetchStatus.IDLE);
+        }
       } catch (error) {
-        setFetchStatus(FetchStatus.FAILED);
-        console.error(error);
+        if (componentIsMounted.current) {
+          setFetchStatus(FetchStatus.FAILED);
+          console.error(error);
+        }
       }
     };
 
     initTrendingRepositories();
+
+    return () => {
+      componentIsMounted.current = false;
+    };
   }, []);
 
   const handleFavouritedRepositoryChange: React.ComponentProps<
