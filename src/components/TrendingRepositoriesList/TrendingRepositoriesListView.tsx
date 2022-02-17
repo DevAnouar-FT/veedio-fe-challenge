@@ -4,16 +4,24 @@ import { FetchStatus } from "../../app/types";
 import List from "../../ui/List";
 import RepositoryInformations from "../RepositoryInformations";
 
-type RepositoryData = React.ComponentProps<typeof RepositoryInformations>;
+type RepositoryData = Omit<
+  React.ComponentProps<typeof RepositoryInformations>,
+  "children"
+>;
 
 interface Props {
   repositories: RepositoryData[];
   fetchStatus: FetchStatus;
+  onFavouritedRepositoryChange(newFavouritedStatusForRepository: {
+    repositoryId: string;
+    favourited: boolean;
+  }): void;
 }
 
 const TrendingRepositoriesListView = ({
   repositories,
   fetchStatus,
+  onFavouritedRepositoryChange,
 }: Props): JSX.Element => {
   const textToDisplayByFetchStatusWhenNoRepositoryIsRendered: Record<
     FetchStatus,
@@ -35,7 +43,16 @@ const TrendingRepositoriesListView = ({
               starsCount={starsCount}
               githubLink={githubLink}
               description={description}
-            />
+            >
+              <RepositoryInformations.FavouriteToggle
+                onFavouritedChange={(favourited) => {
+                  onFavouritedRepositoryChange({
+                    repositoryId: id,
+                    favourited,
+                  });
+                }}
+              />
+            </RepositoryInformations>
           </List.Item>
         )
       )}

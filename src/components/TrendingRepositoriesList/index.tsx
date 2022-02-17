@@ -1,12 +1,14 @@
 import * as React from "react";
 
-import { fetchTrendingRepositoriesCreatedInLastSevenDays } from "../../app/api";
-import { FetchStatus } from "../../app/types";
+import {
+  addRepositoryToFavourites,
+  fetchTrendingRepositoriesCreatedInLastSevenDays,
+  removeRepositoryFromFavourites,
+} from "../../app/api";
+import { FetchStatus, UiRepository } from "../../app/types";
 import TrendingRepositoriesListView from "./TrendingRepositoriesListView";
 
-type Repositories = React.ComponentProps<
-  typeof TrendingRepositoriesListView
->["repositories"];
+type Repositories = UiRepository[];
 
 const TrendingRepositoriesList = (): JSX.Element => {
   const [trendingRepositories, setTrendingRepositories] =
@@ -50,10 +52,23 @@ const TrendingRepositoriesList = (): JSX.Element => {
     initTrendingRepositories();
   }, []);
 
+  const handleFavouritedRepositoryChange: React.ComponentProps<
+    typeof TrendingRepositoriesListView
+  >["onFavouritedRepositoryChange"] = ({ repositoryId, favourited }) => {
+    favourited
+      ? addRepositoryToFavourites(
+          trendingRepositories.find(
+            (currentRepository) => currentRepository.id === repositoryId
+          )!
+        )
+      : removeRepositoryFromFavourites(repositoryId);
+  };
+
   return (
     <TrendingRepositoriesListView
       repositories={trendingRepositories}
       fetchStatus={fetchStatus}
+      onFavouritedRepositoryChange={handleFavouritedRepositoryChange}
     />
   );
 };

@@ -7,26 +7,42 @@ import {
 import { HeartIcon as HeartIconSolid } from "@heroicons/react/solid";
 import { Switch } from "@headlessui/react";
 
-const FavouriteToggle = (): JSX.Element => {
-  const [enabled, setEnabled] = React.useState<boolean>(false);
-  const descriptiveLabel = `${enabled ? "Remove from" : "Add to"} favourites`;
+import type { UiRepository } from "../../app/types";
+
+interface FavouriteToggleProps {
+  onFavouritedChange(favourited: boolean): void;
+}
+
+const FavouriteToggle = ({
+  onFavouritedChange,
+}: FavouriteToggleProps): JSX.Element => {
+  const [favourited, setFavourited] = React.useState<boolean>(false);
+  const descriptiveLabel = `${
+    favourited ? "Remove from" : "Add to"
+  } favourites`;
+
+  const handleChange: React.ComponentProps<typeof Switch>["onChange"] = (
+    checked
+  ) => {
+    setFavourited(checked);
+    onFavouritedChange(checked);
+  };
 
   return (
-    <Switch checked={enabled} onChange={setEnabled} title={descriptiveLabel}>
+    <Switch
+      checked={favourited}
+      onChange={handleChange}
+      title={descriptiveLabel}
+    >
       <span className="sr-only">{descriptiveLabel}</span>
       <span className="inline-block h-6 w-6 text-purple-500">
-        {enabled ? <HeartIconSolid /> : <HeartIconOutline />}
+        {favourited ? <HeartIconSolid /> : <HeartIconOutline />}
       </span>
     </Switch>
   );
 };
 
-interface Props {
-  id: string;
-  name: string;
-  starsCount: number;
-  githubLink: string;
-  description?: string;
+interface Props extends UiRepository {
   children?: React.ReactNode;
 }
 
