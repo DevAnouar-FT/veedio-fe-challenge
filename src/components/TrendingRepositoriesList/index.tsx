@@ -64,10 +64,10 @@ const TrendingRepositoriesList = (): JSX.Element => {
     };
   }, []);
 
-  const handleFavouritedRepositoryChange: React.ComponentProps<
+  const handleFavouriteStatusOfRepositoryChange: React.ComponentProps<
     typeof TrendingRepositoriesListView
-  >["onFavouritedRepositoryChange"] = ({ repositoryId, favourited }) => {
-    favourited
+  >["onFavouriteStatusOfRepositoryChange"] = ({ repositoryId, favourite }) => {
+    favourite
       ? addRepositoryToFavourites(
           trendingRepositories.find(
             (currentRepository) => currentRepository.id === repositoryId
@@ -80,7 +80,9 @@ const TrendingRepositoriesList = (): JSX.Element => {
     <TrendingRepositoriesListView
       repositories={trendingRepositories}
       fetchStatus={fetchStatus}
-      onFavouritedRepositoryChange={handleFavouritedRepositoryChange}
+      onFavouriteStatusOfRepositoryChange={
+        handleFavouriteStatusOfRepositoryChange
+      }
     />
   );
 };

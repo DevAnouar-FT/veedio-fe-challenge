@@ -7,15 +7,15 @@ import RepositoryInformations from "../RepositoryInformations";
 interface Props {
   repositories: UiRepository[];
   fetchStatus: FetchStatus;
-  onFavouritedRepositoryChange: React.ComponentProps<
+  onFavouriteStatusOfRepositoryChange: React.ComponentProps<
     typeof RepositoryInformations.FavouriteToggle
-  >["onFavouritedChange"];
+  >["onFavouriteStatusChange"];
 }
 
 const TrendingRepositoriesListView = ({
   repositories,
   fetchStatus,
-  onFavouritedRepositoryChange,
+  onFavouriteStatusOfRepositoryChange,
 }: Props): JSX.Element => {
   const textToDisplayByFetchStatusWhenNoRepositoryIsRendered: Record<
     FetchStatus,
@@ -31,7 +31,7 @@ const TrendingRepositoriesListView = ({
       {(repositoryId) => (
         <RepositoryInformations.FavouriteToggle
           repositoryId={repositoryId}
-          onFavouritedChange={onFavouritedRepositoryChange}
+          onFavouriteStatusChange={onFavouriteStatusOfRepositoryChange}
         />
       )}
     </RepositoriesList>

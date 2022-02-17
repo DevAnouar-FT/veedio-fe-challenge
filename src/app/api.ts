@@ -1,5 +1,5 @@
 import { trendingRepositoriesCreatedInLastSevenDays as trendingRepositoriesCreatedInLastSevenDaysEndpoint } from "./endpoints";
-import { UiRepository } from "./types";
+import type { FavouriteRepositoriesOnStorage, UiRepository } from "./types";
 
 export interface GitHubRepositoriesApiData {
   items: {
@@ -29,21 +29,20 @@ export const fetchTrendingRepositoriesCreatedInLastSevenDays =
     return response.json() as Promise<GitHubRepositoriesApiData>;
   };
 
-export const favouritedRepositoriesStorageKey = "favouritedRepositories";
+export const favouriteRepositoriesStorageKey = "favouriteRepositories";
 
-export const fetchFavouritedRepositories = (favouritesStorageKey: string) =>
-  JSON.parse(localStorage.getItem(favouritesStorageKey) ?? "{}") as Record<
-    UiRepository["id"],
-    Omit<UiRepository, "id">
-  >;
+export const fetchFavouriteRepositories = (favouritesStorageKey: string) =>
+  JSON.parse(
+    localStorage.getItem(favouritesStorageKey) ?? "{}"
+  ) as FavouriteRepositoriesOnStorage;
 
 export const addRepositoryToFavourites = (repository: UiRepository): void => {
   const { id: repositoryId, ...otherRepositoryData } = repository;
   localStorage.setItem(
-    favouritedRepositoriesStorageKey,
+    favouriteRepositoriesStorageKey,
     JSON.stringify({
       [repositoryId]: otherRepositoryData,
-      ...fetchFavouritedRepositories(favouritedRepositoriesStorageKey),
+      ...fetchFavouriteRepositories(favouriteRepositoriesStorageKey),
     })
   );
 };
@@ -52,15 +51,15 @@ export const removeRepositoryFromFavourites = (
   repositoryId: UiRepository["id"]
 ): void => {
   const { [repositoryId]: repositoryToRemove, ...otherRepositories } =
-    fetchFavouritedRepositories(favouritedRepositoriesStorageKey);
+    fetchFavouriteRepositories(favouriteRepositoriesStorageKey);
 
   localStorage.setItem(
-    favouritedRepositoriesStorageKey,
+    favouriteRepositoriesStorageKey,
     JSON.stringify(otherRepositories)
   );
 };
 
-export const isRepositoryFavourited = (
+export const isRepositoryFavourite = (
   repositoryId: UiRepository["id"]
 ): boolean =>
-  !!fetchFavouritedRepositories(favouritedRepositoriesStorageKey)[repositoryId];
+  !!fetchFavouriteRepositories(favouriteRepositoriesStorageKey)[repositoryId];

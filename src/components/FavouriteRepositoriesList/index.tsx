@@ -1,15 +1,15 @@
 import * as React from "react";
 
 import {
-  favouritedRepositoriesStorageKey,
-  fetchFavouritedRepositories,
+  favouriteRepositoriesStorageKey,
+  fetchFavouriteRepositories,
 } from "../../app/api";
 import RepositoriesList from "../RepositoriesList";
 import type { UiRepository } from "../../app/types";
 
 const FavouriteRepositoriesList = (): JSX.Element => {
-  const favouriteRepositoriesFromStorage = fetchFavouritedRepositories(
-    favouritedRepositoriesStorageKey
+  const favouriteRepositoriesFromStorage = fetchFavouriteRepositories(
+    favouriteRepositoriesStorageKey
   );
   const favouriteRepositoriesToDisplay: UiRepository[] = Object.keys(
     favouriteRepositoriesFromStorage
@@ -22,7 +22,7 @@ const FavouriteRepositoriesList = (): JSX.Element => {
     <RepositoriesList repositories={favouriteRepositoriesToDisplay} />
   ) : (
     <p className="flex justify-center mt-6">
-      "No repository has been favourited yet!"
+      "No repository has been favourite yet!"
     </p>
   );
 };

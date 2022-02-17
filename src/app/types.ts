@@ -6,6 +6,11 @@ export interface UiRepository {
   description?: string;
 }
 
+export type FavouriteRepositoriesOnStorage = Record<
+  UiRepository["id"],
+  Omit<UiRepository, "id">
+>;
+
 export enum FetchStatus {
   IDLE = "idle",
   LOADING = "loading",

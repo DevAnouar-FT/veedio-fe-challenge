@@ -7,46 +7,93 @@ import {
 import { HeartIcon as HeartIconSolid } from "@heroicons/react/solid";
 import { Switch } from "@headlessui/react";
 
-import type { UiRepository } from "../../app/types";
-import { isRepositoryFavourited } from "../../app/api";
+import type {
+  FavouriteRepositoriesOnStorage,
+  UiRepository,
+} from "../../app/types";
+import {
+  favouriteRepositoriesStorageKey,
+  isRepositoryFavourite,
+} from "../../app/api";
 
-interface FavouriteToggleProps {
-  repositoryId: UiRepository["id"];
-  onFavouritedChange(newFavouriteStatusForRepository: {
-    repositoryId: string;
-    favourited: boolean;
-  }): void;
+interface FavouriteToggleViewProps {
+  favourite: boolean;
+  onFavouriteStatusChange(favourite: boolean): void;
 }
 
-const FavouriteToggle = ({
-  repositoryId,
-  onFavouritedChange,
-}: FavouriteToggleProps): JSX.Element => {
-  const [favourited, setFavourited] = React.useState<boolean>(
-    isRepositoryFavourited(repositoryId)
-  );
-  const descriptiveLabel = `${
-    favourited ? "Remove from" : "Add to"
-  } favourites`;
-
-  const handleChange: React.ComponentProps<typeof Switch>["onChange"] = (
-    checked
-  ) => {
-    setFavourited(checked);
-    onFavouritedChange({ repositoryId, favourited: checked });
-  };
+const FavouriteToggleView = ({
+  favourite,
+  onFavouriteStatusChange,
+}: FavouriteToggleViewProps): JSX.Element => {
+  const descriptiveLabel = `${favourite ? "Remove from" : "Add to"} favourites`;
 
   return (
     <Switch
-      checked={favourited}
-      onChange={handleChange}
+      checked={favourite}
+      onChange={onFavouriteStatusChange}
       title={descriptiveLabel}
     >
       <span className="sr-only">{descriptiveLabel}</span>
       <span className="inline-block h-6 w-6 text-purple-500">
-        {favourited ? <HeartIconSolid /> : <HeartIconOutline />}
+        {favourite ? <HeartIconSolid /> : <HeartIconOutline />}
       </span>
     </Switch>
+  );
+};
+
+interface FavouriteToggleContainerProps {
+  repositoryId: UiRepository["id"];
+  onFavouriteStatusChange(newFavouriteStatusData: {
+    repositoryId: string;
+    favourite: boolean;
+  }): void;
+}
+
+const FavouriteToggleContainer = ({
+  repositoryId,
+  onFavouriteStatusChange,
+}: FavouriteToggleContainerProps): JSX.Element => {
+  const [favourite, setfavourite] = React.useState<boolean>(
+    isRepositoryFavourite(repositoryId)
+  );
+
+  React.useEffect(() => {
+    const storageEventType = "storage";
+    const handleStorageEvent = ({ key, newValue }: StorageEvent): void => {
+      if (key === favouriteRepositoriesStorageKey) {
+        const favouriteRepositoriesWithinOtherTab = JSON.parse(
+          newValue ?? "{}"
+        ) as FavouriteRepositoriesOnStorage;
+
+        if (favouriteRepositoriesWithinOtherTab[repositoryId] && !favourite) {
+          setfavourite(true);
+        } else if (
+          !favouriteRepositoriesWithinOtherTab[repositoryId] &&
+          favourite
+        ) {
+          setfavourite(false);
+        }
+      }
+    };
+    window.addEventListener(storageEventType, handleStorageEvent);
+
+    return () => {
+      window.removeEventListener(storageEventType, handleStorageEvent);
+    };
+  }, [favourite, repositoryId]);
+
+  const handleChange: React.ComponentProps<typeof Switch>["onChange"] = (
+    checked
+  ) => {
+    setfavourite(checked);
+    onFavouriteStatusChange({ repositoryId, favourite: checked });
+  };
+
+  return (
+    <FavouriteToggleView
+      favourite={favourite}
+      onFavouriteStatusChange={handleChange}
+    />
   );
 };
 
@@ -119,6 +166,6 @@ const RepositoryInformations = ({
   </div>
 );
 
-RepositoryInformations.FavouriteToggle = FavouriteToggle;
+RepositoryInformations.FavouriteToggle = FavouriteToggleContainer;
 
 export default RepositoryInformations;

@@ -1,16 +1,14 @@
 import * as React from "react";
 import { render, screen } from "@testing-library/react";
 import { LocalStorageMock } from "@react-mock/localstorage";
+
 import FavouriteRepositoriesList from ".";
-import { favouritedRepositoriesStorageKey } from "../../app/api";
-import type { UiRepository } from "../../app/types";
+import { favouriteRepositoriesStorageKey } from "../../app/api";
+import type { FavouriteRepositoriesOnStorage } from "../../app/types";
 
 describe("components/FavouriteRepositoriesList", () => {
-  it("Should display a list of already favourited repositories", () => {
-    const favouritedRepositoriesWithinStorage: Record<
-      UiRepository["id"],
-      Omit<UiRepository, "id">
-    > = {
+  it("Should display a list of already favourite repositories", () => {
+    const favouriteRepositoriesWithinStorage: FavouriteRepositoriesOnStorage = {
       "123456": {
         name: "Repository 1",
         githubLink: "http://github.com/user/repo",
@@ -27,8 +25,8 @@ describe("components/FavouriteRepositoriesList", () => {
     render(
       <LocalStorageMock
         items={{
-          [favouritedRepositoriesStorageKey]: JSON.stringify(
-            favouritedRepositoriesWithinStorage
+          [favouriteRepositoriesStorageKey]: JSON.stringify(
+            favouriteRepositoriesWithinStorage
           ),
         }}
       >
@@ -39,18 +37,18 @@ describe("components/FavouriteRepositoriesList", () => {
     const favouriteRepositoriesListItems = screen.getAllByRole("listitem");
 
     expect(favouriteRepositoriesListItems.length).toEqual<number>(
-      Object.keys(favouritedRepositoriesWithinStorage).length
+      Object.keys(favouriteRepositoriesWithinStorage).length
     );
   });
 
   it(
-    "Should display the 'No repository has been favourited yet!' message instead of a list," +
+    "Should display the 'No repository has been favourite yet!' message instead of a list," +
       " when there is no favourite repository stored on the local storage",
     () => {
       render(
         <LocalStorageMock
           items={{
-            [favouritedRepositoriesStorageKey]: "{}",
+            [favouriteRepositoriesStorageKey]: "{}",
           }}
         >
           <FavouriteRepositoriesList />
@@ -59,7 +57,7 @@ describe("components/FavouriteRepositoriesList", () => {
 
       const favouriteRepositoriesListElement = screen.queryByRole("list");
       const messageElement = screen.getByText(
-        /No repository has been favourited yet!/
+        /No repository has been favourite yet!/
       );
 
       expect(favouriteRepositoriesListElement).not.toBeInTheDocument();

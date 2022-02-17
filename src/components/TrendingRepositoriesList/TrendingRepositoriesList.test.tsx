@@ -20,10 +20,10 @@ import {
   populatedListOfRepositoriesServer,
 } from "../../mocks/servers";
 import {
-  favouritedRepositoriesStorageKey,
-  isRepositoryFavourited,
+  favouriteRepositoriesStorageKey,
+  isRepositoryFavourite,
 } from "../../app/api";
-import { UiRepository } from "../../app/types";
+import type { FavouriteRepositoriesOnStorage } from "../../app/types";
 
 describe("components/TrendingRepositoriesList", () => {
   describe("Using populatedListOfRepositoriesServer", () => {
@@ -90,8 +90,8 @@ describe("components/TrendingRepositoriesList", () => {
     });
 
     it(
-      "Should allow to favourite a repository that is not favourited" +
-        ", (eg. not stored in the favouritedRepositories on the local storage)" +
+      "Should allow to favourite a repository that is not favourite" +
+        ", (eg. not stored in the favouriteRepositories on the local storage)" +
         ", and store it on the local storage",
       async () => {
         const repositoryToFavourite = getGithubRepositoriesCreatedSinceDateFrom(
@@ -99,9 +99,7 @@ describe("components/TrendingRepositoriesList", () => {
           getDateFromSevenDaysAgo()
         )[0];
         render(
-          <LocalStorageMock
-            items={{ [favouritedRepositoriesStorageKey]: "{}" }}
-          >
+          <LocalStorageMock items={{ [favouriteRepositoriesStorageKey]: "{}" }}>
             <TrendingRepositoriesList />
           </LocalStorageMock>
         );
@@ -119,14 +117,14 @@ describe("components/TrendingRepositoriesList", () => {
           repositoryFavouriteToggle.getAttribute("aria-checked")
         ).toEqual<string>("true");
         expect(
-          isRepositoryFavourited(`${repositoryToFavourite.id}`)
+          isRepositoryFavourite(`${repositoryToFavourite.id}`)
         ).toBe<boolean>(true);
       }
     );
 
     it(
-      "Should unfavourite a repository that is already favourited" +
-        ", (eg. stored in the favouritedRepositories on the local storage)" +
+      "Should unfavourite a repository that is already favourite" +
+        ", (eg. stored in the favouriteRepositories on the local storage)" +
         ", and remove it from the local storage",
       async () => {
         const repositoryToUnfavourite =
@@ -137,14 +135,14 @@ describe("components/TrendingRepositoriesList", () => {
         render(
           <LocalStorageMock
             items={{
-              [favouritedRepositoriesStorageKey]: JSON.stringify({
+              [favouriteRepositoriesStorageKey]: JSON.stringify({
                 [repositoryToUnfavourite.id]: {
                   name: repositoryToUnfavourite.name,
                   githubLink: repositoryToUnfavourite.html_url,
                   starsCount: repositoryToUnfavourite.stargazers_count,
                   description: repositoryToUnfavourite.description ?? undefined,
                 },
-              } as Record<UiRepository["id"], Omit<UiRepository, "id">>),
+              } as FavouriteRepositoriesOnStorage),
             }}
           >
             <TrendingRepositoriesList />
@@ -169,10 +167,86 @@ describe("components/TrendingRepositoriesList", () => {
           repositoryFavouriteToggle.getAttribute("aria-checked")
         ).toEqual<string>("false");
         expect(
-          isRepositoryFavourited(`${repositoryToUnfavourite.id}`)
+          isRepositoryFavourite(`${repositoryToUnfavourite.id}`)
         ).toBe<boolean>(false);
       }
     );
+
+    it("Should mark a repository as favorite after it has been marked as favourite within the context of another document", async () => {
+      const repositoryTofavourite = getGithubRepositoriesCreatedSinceDateFrom(
+        githubRepositories,
+        getDateFromSevenDaysAgo()
+      )[0];
+      render(<TrendingRepositoriesList />);
+      const repositoryDataWrapperElement = await screen.findAllByLabelText(
+        `Name: ${repositoryTofavourite.name}`,
+        { selector: "div" }
+      );
+      const repositoryFavouriteToggle = within(
+        repositoryDataWrapperElement[0]
+      ).getByRole("switch");
+
+      fireEvent(
+        window,
+        new StorageEvent("storage", {
+          key: favouriteRepositoriesStorageKey,
+          newValue: JSON.stringify({
+            [repositoryTofavourite.id]: {
+              name: repositoryTofavourite.name,
+              githubLink: repositoryTofavourite.html_url,
+              starsCount: repositoryTofavourite.stargazers_count,
+              description: repositoryTofavourite.description ?? undefined,
+            },
+          } as FavouriteRepositoriesOnStorage),
+        })
+      );
+
+      expect(
+        repositoryFavouriteToggle.getAttribute("aria-checked")
+      ).toEqual<string>("true");
+    });
+
+    it("Should unmark a repository as favorite after it has been unfavourited within the context of another document", async () => {
+      const repositoryToUnfavourite = getGithubRepositoriesCreatedSinceDateFrom(
+        githubRepositories,
+        getDateFromSevenDaysAgo()
+      )[0];
+      render(
+        <LocalStorageMock
+          items={{
+            [favouriteRepositoriesStorageKey]: JSON.stringify({
+              [repositoryToUnfavourite.id]: {
+                name: repositoryToUnfavourite.name,
+                githubLink: repositoryToUnfavourite.html_url,
+                starsCount: repositoryToUnfavourite.stargazers_count,
+                description: repositoryToUnfavourite.description ?? undefined,
+              },
+            } as FavouriteRepositoriesOnStorage),
+          }}
+        >
+          <TrendingRepositoriesList />
+        </LocalStorageMock>
+      );
+      const repositoryDataWrapperElement = await screen.findAllByLabelText(
+        `Name: ${repositoryToUnfavourite.name}`,
+        { selector: "div" }
+      );
+      const repositoryFavouriteToggle = within(
+        repositoryDataWrapperElement[0]
+      ).getByRole("switch");
+
+      fireEvent(
+        window,
+        new StorageEvent("storage", {
+          key: favouriteRepositoriesStorageKey,
+          newValue: "{}",
+        })
+      );
+
+      expect(
+        repositoryFavouriteToggle.getAttribute("aria-checked")
+      ).toEqual<string>("false");
+    });
   });
 
   describe("When the retrieved list of trending repositories is empty", () => {
