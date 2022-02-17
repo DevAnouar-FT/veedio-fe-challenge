@@ -6,10 +6,20 @@ import TrendingRepositoriesList from "./components/TrendingRepositoriesList";
 
 import "./assets/css/app.scss";
 
+const FavouriteRepositoriesList = React.lazy(
+  () => import("./components/FavouriteRepositoriesList")
+);
+
 function App() {
   const tabsTitleContentMap: Record<string, React.ReactNode> = {
     Trending: <TrendingRepositoriesList />,
-    Favourites: null,
+    Favourites: (
+      <React.Suspense
+        fallback={<p className="flex justify-center mt-6">Loading ...</p>}
+      >
+        <FavouriteRepositoriesList />
+      </React.Suspense>
+    ),
   };
 
   return (

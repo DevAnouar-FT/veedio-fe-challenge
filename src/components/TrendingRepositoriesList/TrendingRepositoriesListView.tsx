@@ -1,7 +1,7 @@
 import * as React from "react";
 
 import { FetchStatus, UiRepository } from "../../app/types";
-import List from "../../ui/List";
+import RepositoriesList from "../RepositoriesList";
 import RepositoryInformations from "../RepositoryInformations";
 
 interface Props {
@@ -27,26 +27,14 @@ const TrendingRepositoriesListView = ({
   };
 
   return fetchStatus === FetchStatus.IDLE && repositories.length ? (
-    <List>
-      {repositories.map<JSX.Element>(
-        ({ id, name, starsCount, githubLink, description }) => (
-          <List.Item key={id}>
-            <RepositoryInformations
-              id={id}
-              name={name}
-              starsCount={starsCount}
-              githubLink={githubLink}
-              description={description}
-            >
-              <RepositoryInformations.FavouriteToggle
-                repositoryId={id}
-                onFavouritedChange={onFavouritedRepositoryChange}
-              />
-            </RepositoryInformations>
-          </List.Item>
-        )
+    <RepositoriesList repositories={repositories}>
+      {(repositoryId) => (
+        <RepositoryInformations.FavouriteToggle
+          repositoryId={repositoryId}
+          onFavouritedChange={onFavouritedRepositoryChange}
+        />
       )}
-    </List>
+    </RepositoriesList>
   ) : (
     <p className="flex justify-center mt-6">
       {textToDisplayByFetchStatusWhenNoRepositoryIsRendered[fetchStatus]}

@@ -29,9 +29,9 @@ export const fetchTrendingRepositoriesCreatedInLastSevenDays =
     return response.json() as Promise<GitHubRepositoriesApiData>;
   };
 
-const favouritedRepositoriesStorageKey = "favouritedRepositories";
+export const favouritedRepositoriesStorageKey = "favouritedRepositories";
 
-const fetchFavouritedRepositories = (favouritesStorageKey: string) =>
+export const fetchFavouritedRepositories = (favouritesStorageKey: string) =>
   JSON.parse(localStorage.getItem(favouritesStorageKey) ?? "{}") as Record<
     UiRepository["id"],
     Omit<UiRepository, "id">

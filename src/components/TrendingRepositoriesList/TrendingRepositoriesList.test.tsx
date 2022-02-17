@@ -20,12 +20,12 @@ import {
   populatedListOfRepositoriesServer,
 } from "../../mocks/servers";
 import {
-  addRepositoryToFavourites,
+  favouritedRepositoriesStorageKey,
   isRepositoryFavourited,
 } from "../../app/api";
 import { UiRepository } from "../../app/types";
 
-describe("components/TrendingRepositoriesList.tsx", () => {
+describe("components/TrendingRepositoriesList", () => {
   describe("Using populatedListOfRepositoriesServer", () => {
     beforeAll(() => {
       populatedListOfRepositoriesServer.listen();
@@ -99,7 +99,9 @@ describe("components/TrendingRepositoriesList.tsx", () => {
           getDateFromSevenDaysAgo()
         )[0];
         render(
-          <LocalStorageMock items={{}}>
+          <LocalStorageMock
+            items={{ [favouritedRepositoriesStorageKey]: "{}" }}
+          >
             <TrendingRepositoriesList />
           </LocalStorageMock>
         );
@@ -133,17 +135,21 @@ describe("components/TrendingRepositoriesList.tsx", () => {
             getDateFromSevenDaysAgo()
           )[0];
         render(
-          <LocalStorageMock items={{}}>
+          <LocalStorageMock
+            items={{
+              [favouritedRepositoriesStorageKey]: JSON.stringify({
+                [repositoryToUnfavourite.id]: {
+                  name: repositoryToUnfavourite.name,
+                  githubLink: repositoryToUnfavourite.html_url,
+                  starsCount: repositoryToUnfavourite.stargazers_count,
+                  description: repositoryToUnfavourite.description ?? undefined,
+                },
+              } as Record<UiRepository["id"], Omit<UiRepository, "id">>),
+            }}
+          >
             <TrendingRepositoriesList />
           </LocalStorageMock>
         );
-        addRepositoryToFavourites({
-          id: `${repositoryToUnfavourite.id}`,
-          name: repositoryToUnfavourite.name,
-          githubLink: repositoryToUnfavourite.html_url,
-          starsCount: repositoryToUnfavourite.stargazers_count,
-          description: repositoryToUnfavourite.description ?? undefined,
-        } as UiRepository);
 
         const repositoryDataWrapperElement = await screen.findAllByLabelText(
           `Name: ${repositoryToUnfavourite.name}`,
