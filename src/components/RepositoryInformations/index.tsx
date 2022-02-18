@@ -15,6 +15,7 @@ import {
   favouriteRepositoriesStorageKey,
   isRepositoryFavourite,
 } from "../../app/api";
+import { useFavouriteRepositoriesFromOtherContextUpdateEffect } from "../../app/hooks";
 
 interface FavouriteToggleViewProps {
   favourite: boolean;
@@ -57,30 +58,18 @@ const FavouriteToggleContainer = ({
     isRepositoryFavourite(repositoryId)
   );
 
-  React.useEffect(() => {
-    const storageEventType = "storage";
-    const handleStorageEvent = ({ key, newValue }: StorageEvent): void => {
-      if (key === favouriteRepositoriesStorageKey) {
-        const favouriteRepositoriesWithinOtherTab = JSON.parse(
-          newValue ?? "{}"
-        ) as FavouriteRepositoriesOnStorage;
-
-        if (favouriteRepositoriesWithinOtherTab[repositoryId] && !favourite) {
-          setfavourite(true);
-        } else if (
-          !favouriteRepositoriesWithinOtherTab[repositoryId] &&
-          favourite
-        ) {
-          setfavourite(false);
-        }
+  useFavouriteRepositoriesFromOtherContextUpdateEffect(
+    (favouriteRepositoriesFromOtherContext) => {
+      if (favouriteRepositoriesFromOtherContext[repositoryId] && !favourite) {
+        setfavourite(true);
+      } else if (
+        !favouriteRepositoriesFromOtherContext[repositoryId] &&
+        favourite
+      ) {
+        setfavourite(false);
       }
-    };
-    window.addEventListener(storageEventType, handleStorageEvent);
-
-    return () => {
-      window.removeEventListener(storageEventType, handleStorageEvent);
-    };
-  }, [favourite, repositoryId]);
+    }
+  );
 
   const handleChange: React.ComponentProps<typeof Switch>["onChange"] = (
     checked

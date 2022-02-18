@@ -4,26 +4,26 @@ import {
   favouriteRepositoriesStorageKey,
   fetchFavouriteRepositories,
 } from "../../app/api";
-import RepositoriesList from "../RepositoriesList";
-import type { UiRepository } from "../../app/types";
+import { useFavouriteRepositoriesFromOtherContextUpdateEffect } from "../../app/hooks";
+import FavouriteRepositoriesListView from "./FavouriteRepositoriesListView";
+import type { FavouriteRepositoriesOnStorage } from "../../app/types";
 
 const FavouriteRepositoriesList = (): JSX.Element => {
-  const favouriteRepositoriesFromStorage = fetchFavouriteRepositories(
-    favouriteRepositoriesStorageKey
-  );
-  const favouriteRepositoriesToDisplay: UiRepository[] = Object.keys(
-    favouriteRepositoriesFromStorage
-  ).map<UiRepository>((currentRepositoryId) => ({
-    id: currentRepositoryId,
-    ...favouriteRepositoriesFromStorage[currentRepositoryId],
-  }));
+  const [favouriteRepositories, setFavouriteRepositories] =
+    React.useState<FavouriteRepositoriesOnStorage>(
+      fetchFavouriteRepositories(favouriteRepositoriesStorageKey)
+    );
 
-  return favouriteRepositoriesToDisplay.length ? (
-    <RepositoriesList repositories={favouriteRepositoriesToDisplay} />
-  ) : (
-    <p className="flex justify-center mt-6">
-      "No repository has been favourite yet!"
-    </p>
+  useFavouriteRepositoriesFromOtherContextUpdateEffect(
+    (favouriteRepositoriesFromOtherContext) => {
+      setFavouriteRepositories(favouriteRepositoriesFromOtherContext);
+    }
+  );
+
+  return (
+    <FavouriteRepositoriesListView
+      repositoriesFromStorage={favouriteRepositories}
+    />
   );
 };
 
