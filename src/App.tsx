@@ -59,9 +59,10 @@ function App() {
                     "h-[calc(100vh-6rem)] md:h-[calc(100vh-8rem)]",
                     "md:max-w-xl lg:max-w-4xl mx-auto",
                     "overflow-y-auto",
+                    "scrollbar-thin dark:scrollbar-thumb-slate-700",
                   ])}
                 >
-                  {tabsTitleContentMap[currentTabTitle]}
+                  <div>{tabsTitleContentMap[currentTabTitle]}</div>
                 </div>
               </Tab.Panel>
             )
