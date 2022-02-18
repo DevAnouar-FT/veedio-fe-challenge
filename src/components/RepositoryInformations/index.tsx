@@ -7,15 +7,9 @@ import {
 import { HeartIcon as HeartIconSolid } from "@heroicons/react/solid";
 import { Switch } from "@headlessui/react";
 
-import type {
-  FavouriteRepositoriesOnStorage,
-  UiRepository,
-} from "../../app/types";
-import {
-  favouriteRepositoriesStorageKey,
-  isRepositoryFavourite,
-} from "../../app/api";
+import { isRepositoryFavourite } from "../../app/api";
 import { useFavouriteRepositoriesFromOtherContextUpdateEffect } from "../../app/hooks";
+import type { UiRepository } from "../../app/types";
 
 interface FavouriteToggleViewProps {
   favourite: boolean;

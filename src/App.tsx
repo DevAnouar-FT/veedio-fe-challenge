@@ -25,7 +25,7 @@ function App() {
   return (
     <main>
       <Tab.Group>
-        <Tab.List className="container mx-auto px-8">
+        <Tab.List className="container">
           {Object.keys(tabsTitleContentMap).map<JSX.Element>(
             (currentTabTitle) => (
               <Tab key={`tab-${currentTabTitle}`}>
@@ -52,7 +52,7 @@ function App() {
             (currentTabTitle) => (
               <Tab.Panel
                 key={`panel-${currentTabTitle}`}
-                className="container mx-auto mt-8 px-8"
+                className="container mt-8"
               >
                 <div
                   className={classNames([

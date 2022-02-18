@@ -21,5 +21,5 @@ export const useFavouriteRepositoriesFromOtherContextUpdateEffect = (
     return () => {
       window.removeEventListener(storageEventType, handleStorageEvent);
     };
-  }, []);
+  }, [onFavouriteRepositoriesFromOtherContextUpdate]);
 };

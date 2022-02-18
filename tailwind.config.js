@@ -9,6 +9,13 @@ module.exports = {
         sans: ["Inter", ...defaultTheme.fontFamily.sans],
       },
     },
+    container: {
+      center: true,
+      padding: {
+        DEFAULT: "1rem",
+        sm: "2rem",
+      },
+    },
   },
   plugins: [require("@tailwindcss/typography")],
   darkMode: "class",
