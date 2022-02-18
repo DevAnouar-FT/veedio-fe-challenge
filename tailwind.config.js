@@ -1,5 +1,4 @@
 const defaultTheme = require("tailwindcss/defaultTheme");
-const plugin = require("tailwindcss/plugin");
 
 module.exports = {
   content: ["./src/**/*.{ts,tsx}", "./public/index.html"],
@@ -9,7 +8,17 @@ module.exports = {
         sans: ["Inter", ...defaultTheme.fontFamily.sans],
       },
     },
+    container: {
+      center: true,
+      padding: {
+        DEFAULT: "1rem",
+        sm: "2rem",
+      },
+    },
   },
-  plugins: [require("@tailwindcss/typography")],
+  plugins: [require("@tailwindcss/typography"), require("tailwind-scrollbar")],
+  variants: {
+    scrollbar: ["dark"],
+  },
   darkMode: "class",
 };

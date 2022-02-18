@@ -4,8 +4,8 @@ import type { GitHubRepositoriesApiData } from "../app/api";
 export const githubRepositories: GitHubRepositoriesApiData["items"] = [
   ...Array(30),
 ].map<GitHubRepositoriesApiData["items"][0]>((_, index) => ({
-  id: Math.random() * 100000000,
-  name: "A Trending Repository",
+  id: parseInt(Math.random() * 100000000 + ""),
+  name: `A Trending Repository ${index}`,
   html_url: "https://github.com/user/repo",
   stargazers_count: parseInt(Math.random() * 1000 + ""),
   description: "Some nice desription.",

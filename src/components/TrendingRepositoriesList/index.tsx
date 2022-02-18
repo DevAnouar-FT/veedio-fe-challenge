@@ -1,12 +1,14 @@
 import * as React from "react";
 
-import { fetchTrendingRepositoriesCreatedInLastSevenDays } from "../../app/api";
-import { FetchStatus } from "../../app/types";
+import {
+  addRepositoryToFavourites,
+  fetchTrendingRepositoriesCreatedInLastSevenDays,
+  removeRepositoryFromFavourites,
+} from "../../app/api";
+import { FetchStatus, UiRepository } from "../../app/types";
 import TrendingRepositoriesListView from "./TrendingRepositoriesListView";
 
-type Repositories = React.ComponentProps<
-  typeof TrendingRepositoriesListView
->["repositories"];
+type Repositories = UiRepository[];
 
 const TrendingRepositoriesList = (): JSX.Element => {
   const [trendingRepositories, setTrendingRepositories] =
@@ -16,44 +18,71 @@ const TrendingRepositoriesList = (): JSX.Element => {
     FetchStatus.IDLE
   );
 
+  const componentIsMounted = React.useRef<boolean>(false);
+
   React.useEffect(() => {
+    componentIsMounted.current = true;
+
     const initTrendingRepositories = async (): Promise<void> => {
       try {
         setFetchStatus(FetchStatus.LOADING);
         const fetchedRepositoriesData =
           await fetchTrendingRepositoriesCreatedInLastSevenDays();
 
-        setTrendingRepositories(
-          fetchedRepositoriesData.items.map<Repositories[0]>(
-            ({
-              id,
-              name,
-              stargazers_count: starsCount,
-              html_url: githubLink,
-              description,
-            }) => ({
-              id: `${id}`,
-              name,
-              starsCount,
-              githubLink,
-              description: description ?? undefined,
-            })
-          )
-        );
-        setFetchStatus(FetchStatus.IDLE);
+        if (componentIsMounted.current) {
+          setTrendingRepositories(
+            fetchedRepositoriesData.items.map<UiRepository>(
+              ({
+                id,
+                name,
+                stargazers_count: starsCount,
+                html_url: githubLink,
+                description,
+              }) => ({
+                id: `${id}`,
+                name,
+                starsCount,
+                githubLink,
+                description: description ?? undefined,
+              })
+            )
+          );
+          setFetchStatus(FetchStatus.IDLE);
+        }
       } catch (error) {
-        setFetchStatus(FetchStatus.FAILED);
-        console.error(error);
+        if (componentIsMounted.current) {
+          setFetchStatus(FetchStatus.FAILED);
+          console.error(error);
+        }
       }
     };
 
     initTrendingRepositories();
+
+    return () => {
+      componentIsMounted.current = false;
+    };
   }, []);
+
+  const handleFavouriteStatusOfRepositoryChange: React.ComponentProps<
+    typeof TrendingRepositoriesListView
+  >["onFavouriteStatusOfRepositoryChange"] = ({ repositoryId, favourite }) => {
+    favourite
+      ? addRepositoryToFavourites(
+          trendingRepositories.find(
+            (currentRepository) => currentRepository.id === repositoryId
+          )!
+        )
+      : removeRepositoryFromFavourites(repositoryId);
+  };
 
   return (
     <TrendingRepositoriesListView
       repositories={trendingRepositories}
       fetchStatus={fetchStatus}
+      onFavouriteStatusOfRepositoryChange={
+        handleFavouriteStatusOfRepositoryChange
+      }
     />
   );
 };

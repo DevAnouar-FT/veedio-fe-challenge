@@ -1,50 +1,46 @@
 import * as React from "react";
 
-import { FetchStatus } from "../../app/types";
-import List from "../../ui/List";
-import RepositoryInformations from "../RepositoryInformations";
-
-type RepositoryData = React.ComponentProps<typeof RepositoryInformations>;
+import { FetchStatus, UiRepository } from "../../app/types";
+import NoRepositoryMessage from "../NoRepositoryMessage";
+import type { FavouriteToggleProps } from "../RepositoryInformations";
 
 interface Props {
-  repositories: RepositoryData[];
+  repositories: UiRepository[];
   fetchStatus: FetchStatus;
+  onFavouriteStatusOfRepositoryChange: FavouriteToggleProps["onFavouriteStatusChange"];
 }
+
+const LazyRepositoriesList = React.lazy(() => import("../RepositoriesList"));
+const LazyFavouriteToggle = React.lazy(async () => {
+  const repositoryInformationsModule = await import(
+    "../RepositoryInformations"
+  );
+  return { default: repositoryInformationsModule.default.FavouriteToggle };
+});
 
 const TrendingRepositoriesListView = ({
   repositories,
   fetchStatus,
-}: Props): JSX.Element => {
-  const textToDisplayByFetchStatusWhenNoRepositoryIsRendered: Record<
-    FetchStatus,
-    string
-  > = {
-    loading: "Loading...",
-    idle: "No repository has been found.",
-    failed: "An error has occured!",
-  };
-
-  return fetchStatus === FetchStatus.IDLE && repositories.length ? (
-    <List>
-      {repositories.map<JSX.Element>(
-        ({ id, name, starsCount, githubLink, description }) => (
-          <List.Item key={id}>
-            <RepositoryInformations
-              id={id}
-              name={name}
-              starsCount={starsCount}
-              githubLink={githubLink}
-              description={description}
+  onFavouriteStatusOfRepositoryChange,
+}: Props): JSX.Element => (
+  <React.Suspense
+    fallback={<NoRepositoryMessage fetchStatus={FetchStatus.LOADING} />}
+  >
+    {fetchStatus === FetchStatus.IDLE && repositories.length ? (
+      <LazyRepositoriesList repositories={repositories}>
+        {(repositoryId) => (
+          <React.Suspense fallback={null}>
+            <LazyFavouriteToggle
+              repositoryId={repositoryId}
+              onFavouriteStatusChange={onFavouriteStatusOfRepositoryChange}
             />
-          </List.Item>
-        )
-      )}
-    </List>
-  ) : (
-    <p className="flex justify-center mt-6">
-      {textToDisplayByFetchStatusWhenNoRepositoryIsRendered[fetchStatus]}
-    </p>
-  );
-};
+          </React.Suspense>
+        )}
+      </LazyRepositoriesList>
+    ) : (
+      <NoRepositoryMessage fetchStatus={fetchStatus} />
+    )}
+  </React.Suspense>
+);
 
 export default TrendingRepositoriesListView;

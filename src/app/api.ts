@@ -1,4 +1,5 @@
 import { trendingRepositoriesCreatedInLastSevenDays as trendingRepositoriesCreatedInLastSevenDaysEndpoint } from "./endpoints";
+import type { FavouriteRepositoriesOnStorage, UiRepository } from "./types";
 
 export interface GitHubRepositoriesApiData {
   items: {
@@ -27,3 +28,38 @@ export const fetchTrendingRepositoriesCreatedInLastSevenDays =
 
     return response.json() as Promise<GitHubRepositoriesApiData>;
   };
+
+export const favouriteRepositoriesStorageKey = "favouriteRepositories";
+
+export const fetchFavouriteRepositories = (favouritesStorageKey: string) =>
+  JSON.parse(
+    localStorage.getItem(favouritesStorageKey) ?? "{}"
+  ) as FavouriteRepositoriesOnStorage;
+
+export const addRepositoryToFavourites = (repository: UiRepository): void => {
+  const { id: repositoryId, ...otherRepositoryData } = repository;
+  localStorage.setItem(
+    favouriteRepositoriesStorageKey,
+    JSON.stringify({
+      [repositoryId]: otherRepositoryData,
+      ...fetchFavouriteRepositories(favouriteRepositoriesStorageKey),
+    })
+  );
+};
+
+export const removeRepositoryFromFavourites = (
+  repositoryId: UiRepository["id"]
+): void => {
+  const { [repositoryId]: repositoryToRemove, ...otherRepositories } =
+    fetchFavouriteRepositories(favouriteRepositoriesStorageKey);
+
+  localStorage.setItem(
+    favouriteRepositoriesStorageKey,
+    JSON.stringify(otherRepositories)
+  );
+};
+
+export const isRepositoryFavourite = (
+  repositoryId: UiRepository["id"]
+): boolean =>
+  !!fetchFavouriteRepositories(favouriteRepositoriesStorageKey)[repositoryId];
