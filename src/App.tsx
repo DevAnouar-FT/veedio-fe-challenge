@@ -26,6 +26,7 @@ function App() {
 
   return (
     <main>
+      <h1 className="sr-only">Github Repositories</h1>
       <Tab.Group>
         <Tab.List className="container">
           {Object.keys(tabsTitleContentMap).map<JSX.Element>(
@@ -64,6 +65,7 @@ function App() {
                     "scrollbar-thin dark:scrollbar-thumb-slate-700",
                   ])}
                 >
+                  <h2 className="sr-only">{currentTabTitle} Repositories</h2>
                   <div>{tabsTitleContentMap[currentTabTitle]}</div>
                 </div>
               </Tab.Panel>
