@@ -36,7 +36,7 @@ const FavouriteToggleView = ({
   );
 };
 
-interface FavouriteToggleContainerProps {
+export interface FavouriteToggleProps {
   repositoryId: UiRepository["id"];
   onFavouriteStatusChange(newFavouriteStatusData: {
     repositoryId: string;
@@ -44,10 +44,10 @@ interface FavouriteToggleContainerProps {
   }): void;
 }
 
-const FavouriteToggleContainer = ({
+const FavouriteToggle = ({
   repositoryId,
   onFavouriteStatusChange,
-}: FavouriteToggleContainerProps): JSX.Element => {
+}: FavouriteToggleProps): JSX.Element => {
   const [favourite, setfavourite] = React.useState<boolean>(
     isRepositoryFavourite(repositoryId)
   );
@@ -149,6 +149,6 @@ const RepositoryInformations = ({
   </div>
 );
 
-RepositoryInformations.FavouriteToggle = FavouriteToggleContainer;
+RepositoryInformations.FavouriteToggle = FavouriteToggle;
 
 export default RepositoryInformations;

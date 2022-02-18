@@ -3,6 +3,8 @@ import classNames from "classnames";
 import { Tab } from "@headlessui/react";
 
 import TrendingRepositoriesList from "./components/TrendingRepositoriesList";
+import NoRepositoryMessage from "./components/NoRepositoryMessage";
+import { FetchStatus } from "./app/types";
 
 import "./assets/css/app.scss";
 
@@ -15,7 +17,7 @@ function App() {
     Trending: <TrendingRepositoriesList />,
     Favourites: (
       <React.Suspense
-        fallback={<p className="flex justify-center mt-6">Loading ...</p>}
+        fallback={<NoRepositoryMessage fetchStatus={FetchStatus.LOADING} />}
       >
         <FavouriteRepositoriesList />
       </React.Suspense>
